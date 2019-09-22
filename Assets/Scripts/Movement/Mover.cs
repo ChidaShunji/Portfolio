@@ -3,43 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Mover : MonoBehaviour
+namespace PORTFOLIO.Movement
 {
-    [SerializeField] Transform target;
-
-
-
-    void Update()
+    public class Mover : MonoBehaviour
     {
-        if(Input.GetMouseButton(0))
+        [SerializeField] Transform target;
+
+
+
+        void Update()
         {
-           MoveToCursor();
+            //animationを付随させる
+            UpdateAnimator();
         }
-        //animationを付随させる
-        UpdateAnimator();
-    }
 
-    private void MoveToCursor()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        bool hashit = Physics.Raycast(ray, out hit);
-        if (hashit)
+
+        public void MoveTo(Vector3 destination)
         {
-            GetComponent<NavMeshAgent>().destination = hit.point;
+            GetComponent<NavMeshAgent>().destination = destination;
         }
-    }
-    //animationを追加
-    private void UpdateAnimator()
-    {
-        Vector3 velocity = GetComponent<NavMeshAgent>().velocity;
-        Vector3 localvelocity = transform.InverseTransformDirection(velocity); 
-        float speed = localvelocity.z;
-        GetComponent<Animator>().SetFloat("forwardspeed", speed);
+
+        //animationを追加
+        private void UpdateAnimator()
+        {
+            Vector3 velocity = GetComponent<NavMeshAgent>().velocity;
+            Vector3 localvelocity = transform.InverseTransformDirection(velocity);
+            float speed = localvelocity.z;
+            GetComponent<Animator>().SetFloat("forwardspeed", speed);
+        }
+
+
     }
 
 
 }
-
    
     
