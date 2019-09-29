@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using PORTFOLIO.Combat;
 
 namespace PORTFOLIO.Movement
 {
@@ -9,7 +10,11 @@ namespace PORTFOLIO.Movement
     {
         [SerializeField] Transform target;
 
+        NavMeshAgent navMeshAgent;
 
+        private void Start() {
+            navMeshAgent = GetComponent<NavMeshAgent>();  
+        }
 
         void Update()
         {
@@ -17,24 +22,34 @@ namespace PORTFOLIO.Movement
             UpdateAnimator();
         }
 
+        public void StartMoveAction(Vector3 destination) 
+        {
+            GetComponent<Fighter>().Cancel();
+            MoveTo(destination);   
+        }
 
         public void MoveTo(Vector3 destination)
         {
-            GetComponent<NavMeshAgent>().destination = destination;
+            navMeshAgent.destination = destination;
+            navMeshAgent.isStopped = false;
+        }
+
+        public void Stop()
+        {
+            navMeshAgent.isStopped = true; 
+            //ある位置でストップさせる
         }
 
         //animationを追加
         private void UpdateAnimator()
         {
-            Vector3 velocity = GetComponent<NavMeshAgent>().velocity;
+            Vector3 velocity = navMeshAgent.velocity;
             Vector3 localvelocity = transform.InverseTransformDirection(velocity);
             float speed = localvelocity.z;
             GetComponent<Animator>().SetFloat("forwardspeed", speed);
         }
 
-
     }
-
 
 }
    
