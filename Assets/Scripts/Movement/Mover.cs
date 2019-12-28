@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using PORTFOLIO.Combat;
+using PORTFOLIO.Core;
 
 namespace PORTFOLIO.Movement
 {
-    public class Mover : MonoBehaviour
+    public class Mover : MonoBehaviour, IAction
     {
         [SerializeField] Transform target;
+        [SerializeField] float maxSpeed = 6f;
 
         NavMeshAgent navMeshAgent;
+        Health health;
 
         private void Start() {
             navMeshAgent = GetComponent<NavMeshAgent>();  
@@ -18,27 +21,31 @@ namespace PORTFOLIO.Movement
 
         void Update()
         {
+            //navMeshAgent.enabled = !health.IsDead();
             //animationを付随させる
             UpdateAnimator();
         }
 
-        public void StartMoveAction(Vector3 destination) 
+        public void StartMoveAction(Vector3 destination, float speedFraction) 
         {
-            GetComponent<Fighter>().Cancel();
-            MoveTo(destination);   
+            GetComponent<ActionScheduler>().StartAction(this);  //WHY?
+            //GetComponent<Fighter>().Cancel();
+            MoveTo(destination, speedFraction);   
         }
 
-        public void MoveTo(Vector3 destination)
+        public void MoveTo(Vector3 destination, float speedFraction)
         {
             navMeshAgent.destination = destination;
+            navMeshAgent.speed = maxSpeed * Mathf.Clamp01(speedFraction);
             navMeshAgent.isStopped = false;
         }
 
-        public void Stop()
+        public void Cancel()
         {
             navMeshAgent.isStopped = true; 
             //ある位置でストップさせる
         }
+
 
         //animationを追加
         private void UpdateAnimator()

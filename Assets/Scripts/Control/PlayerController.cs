@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using PORTFOLIO.Combat;
+using PORTFOLIO.Core;
 using PORTFOLIO.Movement;
 using UnityEngine;
 
@@ -10,8 +11,15 @@ namespace PORTFOLIO.Control
 {
     public class PlayerController : MonoBehaviour
     {
+        Health health;
+
+        private void Start() {
+            health = GetComponent<Health>();
+        }
+
         private void Update()
         {
+            if (health.IsDead()) return;
             if (InteractWithCombat()) return; //移動と攻撃の優先順位
             if (InteractWithMovement()) return; //無効なエリアをクリックした時
         }
@@ -23,10 +31,15 @@ namespace PORTFOLIO.Control
             {
                 CombatTarget target =  hit.transform.GetComponent<CombatTarget>();
                 if (target == null) continue;
-                
-                if (Input.GetMouseButtonDown(0))
+
+                GameObject targetGameObject = target.gameObject;
+                if(!GetComponent<Fighter>().CanAttack(targetGameObject))
                 {
-                    GetComponent<Fighter>().Attack(target);
+                    continue;
+                }
+                if (Input.GetMouseButton(0))
+                {
+                    GetComponent<Fighter>().Attack(targetGameObject);
                 }
                 return true;
             }
@@ -50,7 +63,7 @@ namespace PORTFOLIO.Control
                 if (Input.GetMouseButton(0))
                 {
                     //GetComponent<Mover>().MoveTo(hit.point); //methodの共有 Moverから持ってくる
-                    GetComponent<Mover>().StartMoveAction(hit.point);
+                    GetComponent<Mover>().StartMoveAction(hit.point, 1f);
                 }
                 return true;
             }
